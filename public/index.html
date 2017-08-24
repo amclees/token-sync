@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html ng-app="token-sync">
+  <head>
+    <meta charset="utf-8">
+    <title>Token Sync</title>
+
+    <link rel="stylesheet" href="bootstrap.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body ng-controller="TokenSyncController">
+    <div class="container">
+      <div class="header">
+        <h2>{{groupName}} <small>Token Sync</small></h2>
+      </div>
+      <div class="row justify-content-end">
+        <div class="col-4">
+          <div ng-hide="actionInProgress">
+            <p ng-show="authData">Logged in as {{authData.user.displayName}}</p>
+            <div class="btn-group" role="group">
+              <button class="btn btn-success" ng-show="authData && room">Get invite link</button>
+              <button class="btn btn-primary" ng-hide="authData" ng-click="logIn()">Log in with Google</button>
+              <button class="btn btn-danger" ng-show="authData" ng-click="logOut()">Log Out</button>
+            </div>
+          </div>
+          <div ng-show="actionInProgress">
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+      <br />
+      <div class="row" ng-show="room">
+        <table class="table">
+          <thead class="thead-inverse">
+            <tr>
+              <th>Name</th>
+              <th>Tokens</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Otto</td>
+              <td>4</td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-primary">Duplicate</button>
+                  <button class="btn btn-danger">Remove</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Ivan</td>
+              <td>24</td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-primary">Duplicate</button>
+                  <button class="btn btn-danger">Remove</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Otto</td>
+              <td>4</td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-primary">Duplicate</button>
+                  <button class="btn btn-danger">Remove</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="text" class="form-control" placeholder="Name"></td>
+              <td><input type="text" class="form-control" placeholder="Starting Tokens"></td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-success">Add</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div ng-show="authData && !room">
+        <p>Creating room</p>
+      </div>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/2.3.0/angularfire.min.js"></script>
+    <script>
+      var config = {
+        apiKey: "AIzaSyAPdC2jnudHQvzZGB7DuMi8BbWHHAnAlco",
+        authDomain: "token-sync.firebaseapp.com",
+        databaseURL: "https://token-sync.firebaseio.com",
+        projectId: "token-sync",
+        storageBucket: "token-sync.appspot.com",
+        messagingSenderId: "349517655080"
+      };
+      firebase.initializeApp(config);
+    </script>
+    <script src="main.js"></script>
+  </body>
+</html>
