@@ -124,6 +124,8 @@
           $scope.roomOwnersRef.child(room.id).set({
             'id': $scope.authData.user.uid
           });
+          $scope.roomName = '';
+          $scope.tokenName = '';
           $scope.actionInProgress = false;
         };
 
