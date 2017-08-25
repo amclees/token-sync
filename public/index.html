@@ -57,6 +57,7 @@
               <th>Name</th>
               <th>{{room.tokenName}}</th>
               <th ng-show="currentUserIsOwner">Owner</th>
+              <th>Public</th>
               <th ng-show="currentUserIsOwner">Actions</th>
             </tr>
           </thead>
@@ -76,6 +77,12 @@
                   <option ng-hide="member.owner.displayName === 'None'" ng-value="{displayName: 'None', uid: ''}">None</option>
                   <option ng-repeat="user in room.users" ng-value="user">{{user.displayName}}</option>
                 </select>
+              </td>
+              <td>
+                <label class="custom-control custom-checkbox">
+                  <input type="checkbox" class="custom-control-input" ng-model="member.public">
+                  <span class="custom-control-indicator"></span>
+                </label>
               </td>
               <td ng-show="currentUserIsOwner">
                 <div class="btn-group" role="group">

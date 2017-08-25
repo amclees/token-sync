@@ -142,6 +142,7 @@
         };
 
         $scope.deleteRoom = function () {
+          $scope.roomOwnersRef.child($scope.room.id).remove();
           $scope.leaveRoom();
           $scope.roomRef.remove();
         };
@@ -174,7 +175,8 @@
             owner: {
               displayName: 'None',
               uid: ''
-            }
+            },
+            public: false
           });
           $scope.newMemberName = '';
           $scope.newMemberTokens = '';
@@ -187,7 +189,8 @@
             owner: {
               displayName: member.owner.displayName,
               uid: member.owner.uid
-            }
+            },
+            public: member.public
           });
         };
 
