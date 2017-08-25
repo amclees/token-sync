@@ -12,12 +12,15 @@
       <div class="header">
         <h2>{{room.name}} <small>Token Sync</small></h2>
       </div>
+      <div class="alert alert-info" role="alert" ng-show="inviteCode">
+        Your invite code is <span class="alert-link">{{inviteCode}}</span>
+      </div>
       <div class="row justify-content-end">
         <div class="col-4">
           <div ng-hide="actionInProgress">
             <p ng-show="authData">Logged in as {{authData.user.displayName}}</p>
             <div class="btn-group" role="group">
-              <button class="btn btn-success" ng-show="authData && room">Get invite link</button>
+              <button class="btn btn-success" ng-show="authData && room" ng-click="showInviteCode()">Get invite code</button>
               <button class="btn btn-primary" ng-hide="authData" ng-click="logIn()">Log in with Google</button>
               <button class="btn btn-dark" ng-show="authData && room" ng-click="deleteRoom()">Delete room</button>
               <button class="btn btn-danger" ng-show="authData" ng-click="logOut()">Log Out</button>
@@ -82,6 +85,22 @@
         </table>
       </div>
       <div ng-show="authData && !room">
+        <table class="table" ng-hide="existingRooms.length === 0">
+          <thead class="thead-inverse">
+            <tr>
+              <th>Name</th>
+              <th>Token Name</th>
+              <th>Join</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="existingRoom in existingRooms">
+              <td>{{existingRoom.name}}</td>
+              <td>{{existingRoom.tokenName}}</td>
+              <td><button class="btn btn-primary" ng-click="joinRoomIfExists(existingRoom.id)">Join</button></td>
+            </tr>
+          </tbody>
+        </table>
         <form>
           <div class="form-group">
             <label>Room Name</label>
