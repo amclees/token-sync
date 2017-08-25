@@ -7,10 +7,14 @@
     [
       '$scope', '$firebase', '$firebaseAuth', '$firebaseObject',
       function($scope, $firebase, $firebaseAuth, $firebaseObject) {
-        $scope.roomsRef = firebase.database().ref('rooms');
-        $scope.roomOwnersRef = firebase.database().ref('roomOwners');
-        $scope.authObj = $firebaseAuth();
-        $scope.actionInProgress = false;
+        function initialize() {
+          $scope.roomsRef = firebase.database().ref('rooms');
+          $scope.roomOwnersRef = firebase.database().ref('roomOwners');
+          $scope.authObj = $firebaseAuth();
+          $scope.actionInProgress = false;
+        }
+
+        initialize();
 
         $scope.logIn = function(provider) {
           $scope.actionInProgress = true;
@@ -27,11 +31,19 @@
 
         $scope.logOut = function() {
           $scope.actionInProgress = true;
+          if ($scope.room) {
+            $scope.leaveRoom();
+          }
+          $scope.existingRooms.$destroy();
+          $scope.room = null;
+          $scope.inviteCode = null;
+          $scope.roomName = null;
+          $scope.tokenName = null;
+          $scope.newMemberName = null;
+          $scope.newMemberTokens = null;
           $scope.authObj.$signOut().then(function() {
             $scope.authData = null;
-            $scope.room = null;
             $scope.actionInProgress = false;
-            $scope.$apply();
           });
         };
 
