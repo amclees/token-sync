@@ -57,7 +57,8 @@
             $scope.roomsRef.child(owner.val().id).once('value', function(snapshot) {
               if (snapshot.val() !== null) {
                 $scope.roomRef = $scope.roomsRef.child(owner.val().id).child(roomId);
-                $scope.room = $firebaseObject($scope.roomRef);
+                $scope.roomObject = $firebaseObject($scope.roomRef);
+                $scope.roomObject.$bindTo($scope, 'room');
                 joined = true;
               }
               $scope.actionInProgress = false;
@@ -76,15 +77,46 @@
         $scope.createRoom = function() {
           $scope.actionInProgress = true;
           $scope.roomRef = $scope.roomsRef.child($scope.authData.user.uid).push();
-          $scope.room = $firebaseObject($scope.roomRef);
-          $scope.room.id = $scope.roomRef.key;
-          $scope.room.name = $scope.roomName;
-          $scope.room.tokenName = $scope.tokenName;
-          $scope.room.$save();
-          $scope.roomOwnersRef.child($scope.room.id).set({
+          var room = $firebaseObject($scope.roomRef);
+          room.id = $scope.roomRef.key;
+          room.name = $scope.roomName;
+          room.tokenName = $scope.tokenName;
+          room.members = [];
+          room.$save();
+          $scope.roomOwnersRef.child(room.id).set({
             'id': $scope.authData.user.uid
           });
           $scope.actionInProgress = false;
+        };
+
+        $scope.deleteRoom = function () {
+          $scope.leaveRoom();
+          $scope.roomRef.remove();
+        };
+
+        $scope.leaveRoom = function() {
+          $scope.roomObject.$destroy();
+          $scope.inviteCode = null;
+          $scope.room = null;
+        };
+
+        $scope.addNewMember = function() {
+          if (!$scope.room.members) {
+            $scope.room.members = [];
+          }
+          $scope.room.members.push({
+            name: $scope.newMemberName,
+            tokens: $scope.newMemberTokens
+          });
+          $scope.newMemberName = '';
+          $scope.newMemberTokens = '';
+        };
+
+        $scope.duplicateMember = function(member) {
+          $scope.room.members.push({
+            name: member.name,
+            tokens: member.tokens
+          });
         };
       }
     ]

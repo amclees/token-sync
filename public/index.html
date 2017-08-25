@@ -22,6 +22,7 @@
             <div class="btn-group" role="group">
               <button class="btn btn-success" ng-show="authData && room" ng-click="showInviteCode()">Get invite code</button>
               <button class="btn btn-primary" ng-hide="authData" ng-click="logIn()">Log in with Google</button>
+              <button class="btn btn-warning" ng-show="authData && room" ng-click="leaveRoom()">Leave room</button>
               <button class="btn btn-dark" ng-show="authData && room" ng-click="deleteRoom()">Delete room</button>
               <button class="btn btn-danger" ng-show="authData" ng-click="logOut()">Log Out</button>
             </div>
@@ -42,42 +43,22 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>Otto</td>
-              <td>4</td>
+            <tr ng-repeat="member in room.members">
+              <td>{{member.name}}</td>
+              <td>{{member.tokens}}</td>
               <td>
                 <div class="btn-group" role="group">
-                  <button class="btn btn-primary">Duplicate</button>
-                  <button class="btn btn-danger">Remove</button>
+                  <button class="btn btn-primary" ng-click="duplicateMember(member)">Duplicate</button>
+                  <button class="btn btn-danger" ng-click="room.members.splice($index, 1)">Remove</button>
                 </div>
               </td>
             </tr>
             <tr>
-              <td>Ivan</td>
-              <td>24</td>
+              <td><input type="text" class="form-control" placeholder="Name" ng-model="newMemberName"></td>
+              <td><input type="text" class="form-control" placeholder="Starting Tokens" ng-model="newMemberTokens"></td>
               <td>
                 <div class="btn-group" role="group">
-                  <button class="btn btn-primary">Duplicate</button>
-                  <button class="btn btn-danger">Remove</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Otto</td>
-              <td>4</td>
-              <td>
-                <div class="btn-group" role="group">
-                  <button class="btn btn-primary">Duplicate</button>
-                  <button class="btn btn-danger">Remove</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td><input type="text" class="form-control" placeholder="Name"></td>
-              <td><input type="text" class="form-control" placeholder="Starting Tokens"></td>
-              <td>
-                <div class="btn-group" role="group">
-                  <button class="btn btn-success">Add</button>
+                  <button class="btn btn-success" ng-click="addNewMember()">Add</button>
                 </div>
               </td>
             </tr>
