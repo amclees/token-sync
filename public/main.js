@@ -102,9 +102,17 @@
               $scope.actionInProgress = false;
               $scope.currentUserIsOwner = owner.val().id === $scope.authData.user.uid;
               $scope.$apply();
-              if ($scope.room) {
+              setTimeout(function() {
                 document.title = $scope.room.name + ' Token Sync';
-              }
+                if(!$scope.room.users) {
+                  $scope.room.users = [];
+                }
+                $scope.room.users.push({
+                  displayName: $scope.authData.user.displayName,
+                  uid: $scope.authData.user.uid
+                });
+                $scope.$apply();
+              }, 100);
               if (callback) {
                 callback(joined);
               }
@@ -139,6 +147,15 @@
         };
 
         $scope.leaveRoom = function() {
+          if ($scope.roomObject.users) {
+            for (var i = 0; i < $scope.roomObject.users.length; i++) {
+              if($scope.roomObject.users[i].uid === $scope.authData.user.uid) {
+                $scope.roomObject.users.splice(i, 1);
+                i--;
+              }
+            }
+          }
+          $scope.roomObject.$save();
           $scope.roomObject.$destroy();
           $scope.inviteCode = null;
           $scope.room = null;
@@ -154,7 +171,10 @@
           $scope.room.members.push({
             name: $scope.newMemberName,
             tokens: $scope.newMemberTokens,
-            owner: ''
+            owner: {
+              displayName: 'None',
+              uid: ''
+            }
           });
           $scope.newMemberName = '';
           $scope.newMemberTokens = '';
@@ -163,7 +183,11 @@
         $scope.duplicateMember = function(member) {
           $scope.room.members.push({
             name: member.name,
-            tokens: member.tokens
+            tokens: member.tokens,
+            owner: {
+              displayName: member.owner.displayName,
+              uid: member.owner.uid
+            }
           });
         };
 
@@ -182,6 +206,13 @@
               $scope.invalidInviteWarning = true;
             }
           });
+        };
+
+        $scope.removeUser = function(user) {
+          var index = $scope.room.users.indexOf(user);
+          if (index !== -1) {
+            $scope.room.users.splice(index, 1);
+          }
         };
       }
     ]

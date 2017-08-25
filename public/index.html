@@ -33,6 +33,23 @@
         </div>
       </div>
       <br />
+      <div class="row" ng-show="room && currentUserIsOwner">
+        <table class="table">
+          <thead>
+            <tr>
+              <td>Name</td>
+              <td>Actions</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="user in room.users">
+              <td>{{user.displayName}}</td>
+              <td><button type="button" class="btn btn-danger" ng-click="removeUser(user)">Remove</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <br />
       <div class="row" ng-show="room">
         <table class="table">
           <thead class="thead-inverse">
@@ -55,10 +72,9 @@
               </td>
               <td ng-show="currentUserIsOwner">
                 <select class="custom-select" ng-model="member.owner">
-                  <option selected value="">None</option>
-                  <span ng-repeat="user of users">
-                    <option value="{{user}}">{{user.displayName}}</option>
-                  </span>
+                  <option selected ng-value="member.owner">{{member.owner.displayName}}</option>
+                  <option ng-hide="member.owner.displayName === 'None'" ng-value="{displayName: 'None', uid: ''}">None</option>
+                  <option ng-repeat="user in room.users" ng-value="user">{{user.displayName}}</option>
                 </select>
               </td>
               <td ng-show="currentUserIsOwner">
@@ -72,7 +88,7 @@
             </tr>
             <tr ng-show="currentUserIsOwner">
               <td><input type="text" class="form-control" placeholder="Name" ng-model="newMemberName"></td>
-              <td><input type="text" class="form-control" placeholder="Starting Tokens" ng-model="newMemberTokens"></td>
+              <td><input type="text" class="form-control" placeholder="Initial {{room.tokenName}}" ng-model="newMemberTokens"></td>
               <td>
                 <div class="btn-group" role="group">
                   <button type="button" class="btn btn-success" ng-click="addNewMember()">Add</button>
