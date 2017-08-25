@@ -3,6 +3,26 @@
 
   var app = angular.module('token-sync', ['firebase']);
 
+  app.directive('contenteditable', function() {
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function(scope, element, attributes, ngModel) {
+        var setViewValue = function() {
+          ngModel.$setViewValue(element.html());
+        };
+
+        ngModel.$render = function() {
+          element.html(ngModel.$viewValue || '');
+        };
+
+        element.bind('blur', function($event) {
+          scope.$apply(setViewValue);
+        });
+      }
+    };
+  });
+
   app.controller('TokenSyncController',
     [
       '$scope', '$firebase', '$firebaseAuth', '$firebaseObject',
