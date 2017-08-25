@@ -48,8 +48,10 @@
               <td><p contenteditable ng-model="member.tokens"></p></td>
               <td>
                 <div class="btn-group" role="group">
+                  <button class="btn btn-success" ng-click="incrementTokens(member, 1)">➕</button>
+                  <button class="btn btn-danger" ng-click="incrementTokens(member, -1)">➖</button>
                   <button class="btn btn-primary" ng-click="duplicateMember(member)">Duplicate</button>
-                  <button class="btn btn-danger" ng-click="room.members.splice($index, 1)">Remove</button>
+                  <button class="btn btn-dark" ng-click="room.members.splice($index, 1)">Remove</button>
                 </div>
               </td>
             </tr>
@@ -66,12 +68,20 @@
         </table>
       </div>
       <div ng-show="authData && !room">
+        <form class="form-inline">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Enter invite code" ng-model="inviteCode" />
+          </div>
+          <button type="submit" class="btn btn-primary" ng-click="joinByInvite()">Join Room</button>
+          <p ng-show="invalidInviteWarning" class="text-danger"><strong>　That room does not exist</strong></p>
+        </form>
+        <br />
         <table class="table" ng-hide="existingRooms.length === 0">
           <thead class="thead-inverse">
             <tr>
               <th>Name</th>
-              <th>Token Name</th>
-              <th>Join</th>
+              <th>Tokens</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>

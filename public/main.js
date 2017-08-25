@@ -65,6 +65,7 @@
           $scope.tokenName = null;
           $scope.newMemberName = null;
           $scope.newMemberTokens = null;
+          $scope.inviteCode = null;
           $scope.authObj.$signOut().then(function() {
             $scope.authData = null;
             $scope.actionInProgress = false;
@@ -99,6 +100,7 @@
               }
               $scope.actionInProgress = false;
               $scope.$apply();
+              document.title = $scope.room.name + ' Token Sync';
               if (callback) {
                 callback(joined);
               }
@@ -134,6 +136,7 @@
           $scope.roomObject.$destroy();
           $scope.inviteCode = null;
           $scope.room = null;
+          document.title = 'Token Sync';
         };
 
         $scope.addNewMember = function() {
@@ -153,6 +156,12 @@
             name: member.name,
             tokens: member.tokens
           });
+        };
+
+        $scope.incrementTokens = function(member, increment) {
+          if (!isNaN(Number(member.tokens))) {
+            member.tokens = '' + (Number(member.tokens) + increment);
+          }
         };
       }
     ]
