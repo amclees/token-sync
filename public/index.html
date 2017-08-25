@@ -10,7 +10,7 @@
   <body ng-controller="TokenSyncController">
     <div class="container">
       <div class="header">
-        <h2>{{groupName}} <small>Token Sync</small></h2>
+        <h2>{{room.name}} <small>Token Sync</small></h2>
       </div>
       <div class="row justify-content-end">
         <div class="col-4">
@@ -19,6 +19,7 @@
             <div class="btn-group" role="group">
               <button class="btn btn-success" ng-show="authData && room">Get invite link</button>
               <button class="btn btn-primary" ng-hide="authData" ng-click="logIn()">Log in with Google</button>
+              <button class="btn btn-dark" ng-show="authData && room" ng-click="deleteRoom()">Delete room</button>
               <button class="btn btn-danger" ng-show="authData" ng-click="logOut()">Log Out</button>
             </div>
           </div>
@@ -33,7 +34,7 @@
           <thead class="thead-inverse">
             <tr>
               <th>Name</th>
-              <th>Tokens</th>
+              <th>{{room.tokenName}}</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -81,7 +82,17 @@
         </table>
       </div>
       <div ng-show="authData && !room">
-        <p>Creating room</p>
+        <form>
+          <div class="form-group">
+            <label>Room Name</label>
+            <input type="text" class="form-control" placeholder="Enter room name" ng-model="roomName">
+          </div>
+          <div class="form-group">
+            <label>Token Name</label>
+            <input type="text" class="form-control" placeholder="Enter token name (e.g. Dollars, Subordinates, etc.)" ng-model="tokenName">
+          </div>
+          <button type="submit" class="btn btn-primary" ng-click="createRoom()">Create Room</button>
+        </form>
       </div>
     </div>
     <script src="https://www.gstatic.com/firebasejs/4.3.0/firebase.js"></script>

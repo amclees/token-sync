@@ -1,19 +1,19 @@
 (function() {
   'use strict';
 
-  var app = angular.module("token-sync", ["firebase"]);
+  var app = angular.module('token-sync', ['firebase']);
 
-  app.controller("TokenSyncController",
+  app.controller('TokenSyncController',
     [
-      "$scope", "$firebase", "$firebaseAuth",
-      function($scope, $firebase, $firebaseAuth) {
-        var room = null;
+      '$scope', '$firebase', '$firebaseAuth', '$firebaseObject',
+      function($scope, $firebase, $firebaseAuth, $firebaseObject) {
+        var roomId = null;
         try {
           var getParameters = window.location.search.split('&')[1].split('='),
               roomNext = false;
           for (var i = 0; i < getParameters.length; i++) {
             if (i % 2 === 0 && getParameters[i] === 'room') {
-              room = getParameters[i + 1];
+              roomId = getParameters[i + 1];
               break;
             }
           }
@@ -21,7 +21,11 @@
           // Room parameter not included
         }
 
-        $scope.rootRef = firebase.database().ref();
+        if (roomId) {
+          $scope.joinRoomById(room);
+        }
+
+        $scope.roomsRef = firebase.database().ref('rooms');
         $scope.authObj = $firebaseAuth();
         $scope.actionInProgress = false;
 
@@ -32,9 +36,9 @@
           }
           $scope.authObj.$signInWithPopup(provider).then(function(authData) {
             $scope.authData = authData;
-            $scope.actionInProgress = false;
+            $scope.joinUserRoomIfExists();
           }, function(error) {
-             console.error("Login failed: ", error);
+             console.error('Login failed: ', error);
           });
         };
 
@@ -47,8 +51,30 @@
           });
         };
 
-        $scope.createRoom = function() {
+        $scope.joinUserRoomIfExists = function() {
+          $scope.actionInProgress = true;
+          $scope.roomsRef.child($scope.authData.user.uid).once('value', function(snapshot) {
+            if (snapshot.val() !== null) {
+              $scope.roomRef = $scope.roomsRef.child($scope.authData.user.uid);
+              $scope.room = $firebaseObject($scope.roomRef);
+            }
+            $scope.actionInProgress = false;
+          });
+        };
 
+
+        $scope.joinRoomByInvite = function(invite) {
+
+        };
+
+        $scope.createRoom = function() {
+          $scope.actionInProgress = true;
+          $scope.roomRef = $scope.roomsRef.child($scope.authData.user.uid);
+          $scope.room = $firebaseObject($scope.roomRef);
+          $scope.room.name = $scope.roomName;
+          $scope.room.tokenName = $scope.tokenName;
+          $scope.room.$save();
+          $scope.actionInProgress = false;
         };
       }
     ]
