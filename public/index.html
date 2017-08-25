@@ -44,8 +44,8 @@
           </thead>
           <tbody>
             <tr ng-repeat="member in room.members">
-              <td contenteditable ng-model="member.name"></td>
-              <td contenteditable ng-model="member.tokens"></td>
+              <td><p contenteditable ng-model="member.name"></p></td>
+              <td><p contenteditable ng-model="member.tokens"></p></td>
               <td>
                 <div class="btn-group" role="group">
                   <button class="btn btn-primary" ng-click="duplicateMember(member)">Duplicate</button>

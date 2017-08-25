@@ -9,6 +9,10 @@
       require: 'ngModel',
       link: function(scope, element, attributes, ngModel) {
         var setViewValue = function() {
+          var elementHTML = element.html();
+          if (elementHTML.indexOf('<') !== -1) {
+            element.html(elementHTML.replace(/<.*>/g, ''));
+          }
           ngModel.$setViewValue(element.html());
         };
 
