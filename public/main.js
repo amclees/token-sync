@@ -66,6 +66,7 @@
           $scope.newMemberName = null;
           $scope.newMemberTokens = null;
           $scope.inviteCode = null;
+          $scope.inviteCodeInput = '';
           $scope.authObj.$signOut().then(function() {
             $scope.authData = null;
             $scope.actionInProgress = false;
@@ -99,8 +100,11 @@
                 joined = true;
               }
               $scope.actionInProgress = false;
+              $scope.currentUserIsOwner = owner.val().id === $scope.authData.user.uid;
               $scope.$apply();
-              document.title = $scope.room.name + ' Token Sync';
+              if ($scope.room) {
+                document.title = $scope.room.name + ' Token Sync';
+              }
               if (callback) {
                 callback(joined);
               }
@@ -138,6 +142,8 @@
           $scope.roomObject.$destroy();
           $scope.inviteCode = null;
           $scope.room = null;
+          $scope.currentUserIsOwner = null;
+          $scope.invalidInviteWarning = false;
           document.title = 'Token Sync';
         };
 
@@ -147,7 +153,8 @@
           }
           $scope.room.members.push({
             name: $scope.newMemberName,
-            tokens: $scope.newMemberTokens
+            tokens: $scope.newMemberTokens,
+            owner: ''
           });
           $scope.newMemberName = '';
           $scope.newMemberTokens = '';
@@ -164,6 +171,17 @@
           if (!isNaN(Number(member.tokens))) {
             member.tokens = '' + (Number(member.tokens) + increment);
           }
+        };
+
+        $scope.joinByInvite = function() {
+          $scope.joinRoomIfExists($scope.inviteCodeInput, function(joined) {
+            if (joined) {
+              $scope.inviteCodeInput = '';
+              $scope.invalidInviteWarning = false;
+            } else {
+              $scope.invalidInviteWarning = true;
+            }
+          });
         };
       }
     ]
