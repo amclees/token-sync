@@ -42,7 +42,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="user in room.users">
+            <tr ng-repeat="user in users">
               <td>{{user.displayName}}</td>
               <td><button type="button" class="btn btn-danger" ng-click="removeUser(user)">Remove</button></td>
             </tr>
@@ -62,7 +62,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="member in room.members">
+            <tr ng-repeat="member in members">
               <td>
                 <p ng-show="currentUserIsOwner" contenteditable ng-model="member.name"></p>
                 <p ng-hide="currentUserIsOwner">{{member.name}}</p>
@@ -72,14 +72,14 @@
                 <p ng-hide="currentUserIsOwner">{{member.tokens}}</p>
               </td>
               <td ng-show="currentUserIsOwner">
-                <select class="custom-select" ng-model="member.owner">
+                <select class="custom-select" ng-model="member.owner" ng-change="members.$save(member)">
                   <option selected ng-value="member.owner">{{member.owner.displayName}}</option>
                   <option ng-hide="member.owner.displayName === 'None'" ng-value="{displayName: 'None', uid: ''}">None</option>
-                  <option ng-repeat="user in room.users" ng-value="user">{{user.displayName}}</option>
+                  <option ng-repeat="user in users" ng-value="user">{{user.displayName}}</option>
                 </select>
               </td>
               <td>
-                <label class="custom-control custom-checkbox">
+                <label class="custom-control custom-checkbox" ng-click="members.$save(member)">
                   <input type="checkbox" class="custom-control-input" ng-model="member.public">
                   <span class="custom-control-indicator"></span>
                 </label>
@@ -89,7 +89,7 @@
                   <button type="button" class="btn btn-success" ng-click="incrementTokens(member, 1)">➕</button>
                   <button type="button" class="btn btn-danger" ng-click="incrementTokens(member, -1)">➖</button>
                   <button type="button" class="btn btn-primary" ng-click="duplicateMember(member)">Duplicate</button>
-                  <button type="button" class="btn btn-dark" ng-click="room.members.splice($index, 1)">Remove</button>
+                  <button type="button" class="btn btn-dark" ng-click="members.$remove(member)">Remove</button>
                 </div>
               </td>
             </tr>

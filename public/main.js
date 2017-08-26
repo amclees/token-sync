@@ -8,11 +8,11 @@
       restrict: 'A',
       require: 'ngModel',
       link: function(scope, element, attributes, ngModel) {
+        scope.$watch(attributes.ngModel, function() {
+          scope.members.$save(scope.member);
+        });
+
         var setViewValue = function() {
-          var elementHTML = element.html();
-          if (elementHTML.indexOf('<') !== -1) {
-            element.html(elementHTML.replace(/<.*>/g, ''));
-          }
           ngModel.$setViewValue(element.html());
         };
 
@@ -20,7 +20,7 @@
           element.html(ngModel.$viewValue || '');
         };
 
-        element.bind('blur', function($event) {
+        element.bind('blur keyup', function($event) {
           scope.$apply(setViewValue);
         });
       }
@@ -29,10 +29,11 @@
 
   app.controller('TokenSyncController',
     [
-      '$scope', '$firebase', '$firebaseAuth', '$firebaseObject',
-      function($scope, $firebase, $firebaseAuth, $firebaseObject) {
+      '$scope', '$firebase', '$firebaseAuth', '$firebaseObject', '$firebaseArray',
+      function($scope, $firebase, $firebaseAuth, $firebaseObject, $firebaseArray) {
         function initialize() {
           $scope.roomsRef = firebase.database().ref('rooms');
+          $scope.roomArraysRef = firebase.database().ref('roomArrays');
           $scope.roomOwnersRef = firebase.database().ref('roomOwners');
           $scope.authObj = $firebaseAuth();
           $scope.actionInProgress = false;
@@ -97,21 +98,29 @@
                 $scope.roomRef = $scope.roomsRef.child(owner.val().id).child(roomId);
                 $scope.roomObject = $firebaseObject($scope.roomRef);
                 $scope.roomObject.$bindTo($scope, 'room');
+
+                $scope.roomArrayRef = $scope.roomArraysRef.child(roomId);
+
+                $scope.membersRef = $scope.roomArrayRef.child('members');
+                $scope.members = $firebaseArray($scope.membersRef);
+
+                $scope.usersRef = $scope.roomArrayRef.child('users');
+                $scope.users = $firebaseArray($scope.usersRef);
+
                 joined = true;
               }
               $scope.actionInProgress = false;
               $scope.currentUserIsOwner = owner.val().id === $scope.authData.user.uid;
               $scope.$apply();
               setTimeout(function() {
-                document.title = $scope.room.name + ' Token Sync';
-                if(!$scope.room.users) {
-                  $scope.room.users = [];
+                if (joined) {
+                  document.title = $scope.room.name + ' Token Sync';
+                  $scope.users.$add({
+                    displayName: $scope.authData.user.displayName,
+                    uid: $scope.authData.user.uid
+                  });
+                  $scope.$apply();
                 }
-                $scope.room.users.push({
-                  displayName: $scope.authData.user.displayName,
-                  uid: $scope.authData.user.uid
-                });
-                $scope.$apply();
               }, 100);
               if (callback) {
                 callback(joined);
@@ -131,8 +140,16 @@
           room.id = $scope.roomRef.key;
           room.name = $scope.roomName;
           room.tokenName = $scope.tokenName;
-          room.members = [];
           room.$save();
+
+          $scope.roomArrayRef = $scope.roomArraysRef.child(room.id);
+
+          $scope.membersRef = $scope.roomArrayRef.child('members');
+          $scope.members = $firebaseArray($scope.membersRef);
+
+          $scope.usersRef = $scope.roomArrayRef.child('users');
+          $scope.users = $firebaseArray($scope.usersRef);
+
           $scope.roomOwnersRef.child(room.id).set({
             'id': $scope.authData.user.uid
           });
@@ -166,10 +183,7 @@
         };
 
         $scope.addNewMember = function() {
-          if (!$scope.room.members) {
-            $scope.room.members = [];
-          }
-          $scope.room.members.push({
+          $scope.members.$add({
             name: $scope.newMemberName,
             tokens: $scope.newMemberTokens,
             owner: {
@@ -183,7 +197,7 @@
         };
 
         $scope.duplicateMember = function(member) {
-          $scope.room.members.push({
+          $scope.members.$add({
             name: member.name,
             tokens: member.tokens,
             owner: {
@@ -197,6 +211,7 @@
         $scope.incrementTokens = function(member, increment) {
           if (!isNaN(Number(member.tokens))) {
             member.tokens = '' + (Number(member.tokens) + increment);
+            $scope.members.$save(member);
           }
         };
 
@@ -212,10 +227,7 @@
         };
 
         $scope.removeUser = function(user) {
-          var index = $scope.room.users.indexOf(user);
-          if (index !== -1) {
-            $scope.room.users.splice(index, 1);
-          }
+          $scope.users.$remove(user);
         };
       }
     ]
