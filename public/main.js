@@ -64,7 +64,6 @@
           if ($scope.room) {
             $scope.leaveRoom();
           }
-          $scope.existingRooms.$destroy();
           $scope.room = null;
           $scope.inviteCode = null;
           $scope.roomName = null;
@@ -88,6 +87,10 @@
           $scope.joinedRoomsRef = $scope.joinedRef.child($scope.authData.user.uid);
           $scope.joinedRoomsIdObject = $firebaseObject($scope.joinedRoomsRef);
           $scope.joinedRoomsIdObject.$bindTo($scope, 'joinedRoomsId').then(function() {
+            if (!$scope.joinedRoomsId.rooms) {
+              $scope.actionInProgress = false;
+              return;
+            }
             $scope.joinedRooms = [];
             for (var i = 0; i < $scope.joinedRoomsId.rooms.length; i++) {
               var roomId = $scope.joinedRoomsId.rooms[i];
