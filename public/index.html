@@ -69,7 +69,7 @@
               </td>
               <td>
                 <p ng-show="currentUserIsOwner" contenteditable ng-model="member.tokens"></p>
-                <p ng-hide="currentUserIsOwner">{{member.tokens}}</p>
+                <p ng-hide="currentUserIsOwner || (!member.public && member.owner.uid !== authData.user.uid)">{{member.tokens}}</p>
               </td>
               <td ng-show="currentUserIsOwner">
                 <select class="custom-select" ng-model="member.owner" ng-change="members.$save(member)">
@@ -80,7 +80,7 @@
               </td>
               <td>
                 <label class="custom-control custom-checkbox" ng-click="members.$save(member)">
-                  <input type="checkbox" class="custom-control-input" ng-model="member.public">
+                  <input type="checkbox" class="custom-control-input" ng-model="member.public" ng-disabled="!currentUserIsOwner && member.owner.uid !== authData.user.uid">
                   <span class="custom-control-indicator"></span>
                 </label>
               </td>

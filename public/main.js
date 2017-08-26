@@ -13,6 +13,10 @@
         });
 
         var setViewValue = function() {
+          var elementHTML = element.html();
+          if (elementHTML.indexOf('<') !== -1) {
+            element.html(elementHTML.replace(/<.*>/g, ''));
+          }
           ngModel.$setViewValue(element.html());
         };
 
@@ -95,6 +99,7 @@
 
             $scope.roomsRef.child(owner.val().id).once('value', function(snapshot) {
               if (snapshot.val() !== null) {
+                $scope.currentUserIsOwner = owner.val().id === $scope.authData.user.uid;
                 $scope.roomRef = $scope.roomsRef.child(owner.val().id).child(roomId);
                 $scope.roomObject = $firebaseObject($scope.roomRef);
                 $scope.roomObject.$bindTo($scope, 'room');
@@ -110,7 +115,6 @@
                 joined = true;
               }
               $scope.actionInProgress = false;
-              $scope.currentUserIsOwner = owner.val().id === $scope.authData.user.uid;
               $scope.$apply();
               setTimeout(function() {
                 if (joined) {
@@ -165,15 +169,28 @@
         };
 
         $scope.leaveRoom = function() {
-          if ($scope.roomObject.users) {
-            for (var i = 0; i < $scope.roomObject.users.length; i++) {
-              if($scope.roomObject.users[i].uid === $scope.authData.user.uid) {
-                $scope.roomObject.users.splice(i, 1);
-                i--;
+          if ($scope.users) {
+
+            var safety = 0,
+                safetyMax = 1000;
+
+            var deleteDuplicate = function() {
+              if(safety++ >= safetyMax) {
+                  return;
               }
-            }
+              for (var i = 0; i < $scope.users.length; i++) {
+                if($scope.users[i].uid === $scope.authData.user.uid) {
+                  $scope.users.$remove(i).then(function() {
+                    deleteDuplicate();
+                  });
+                  return;
+                }
+              }
+              $scope.users.$destroy();
+            };
+
+            deleteDuplicate();
           }
-          $scope.roomObject.$save();
           $scope.roomObject.$destroy();
           $scope.inviteCode = null;
           $scope.room = null;
