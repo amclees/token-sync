@@ -123,7 +123,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr ng-repeat="existingRoom in existingRooms">
+            <tr ng-repeat="existingRoom in existingOwnedRooms">
+              <td>{{existingRoom.name}}</td>
+              <td>{{existingRoom.tokenName}}</td>
+              <td><button type="button" class="btn btn-primary" ng-click="joinRoomIfExists(existingRoom.id)">Join</button></td>
+            </tr>
+            <tr ng-repeat="existingRoom in joinedRooms">
               <td>{{existingRoom.name}}</td>
               <td>{{existingRoom.tokenName}}</td>
               <td><button type="button" class="btn btn-primary" ng-click="joinRoomIfExists(existingRoom.id)">Join</button></td>

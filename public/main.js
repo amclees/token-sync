@@ -39,6 +39,7 @@
           $scope.roomsRef = firebase.database().ref('rooms');
           $scope.roomArraysRef = firebase.database().ref('roomArrays');
           $scope.roomOwnersRef = firebase.database().ref('roomOwners');
+          $scope.joinedRef = firebase.database().ref('joinedRooms');
           $scope.authObj = $firebaseAuth();
           $scope.actionInProgress = false;
         }
@@ -80,9 +81,25 @@
 
         $scope.getExistingRooms = function() {
           $scope.actionInProgress = true;
+
           $scope.userRoomsRef = $scope.roomsRef.child($scope.authData.user.uid);
-          $scope.existingRooms = $firebaseObject($scope.userRoomsRef);
-          $scope.actionInProgress = false;
+          $scope.existingOwnedRooms = $firebaseObject($scope.userRoomsRef);
+
+          $scope.joinedRoomsRef = $scope.joinedRef.child($scope.authData.user.uid);
+          $scope.joinedRoomsIdObject = $firebaseObject($scope.joinedRoomsRef);
+          $scope.joinedRoomsIdObject.$bindTo($scope, 'joinedRoomsId').then(function() {
+            $scope.joinedRooms = [];
+            for (var i = 0; i < $scope.joinedRoomsId.rooms.length; i++) {
+              var roomId = $scope.joinedRoomsId.rooms[i];
+              $scope.roomOwnersRef.child(roomId).once('value', function(owner) {
+                $scope.roomsRef.child(owner.val().id).once('value', function(snapshot) {
+                    $scope.joinedRooms.push(snapshot.val()[roomId]);
+                    $scope.$apply();
+                });
+              });
+            }
+            $scope.actionInProgress = false;
+          });
         };
 
         $scope.joinRoomIfExists = function(roomId, callback) {
@@ -235,6 +252,10 @@
         $scope.joinByInvite = function() {
           $scope.joinRoomIfExists($scope.inviteCodeInput, function(joined) {
             if (joined) {
+              if (!$scope.joinedRoomsId.rooms) {
+                $scope.joinedRoomsId.rooms = [];
+              }
+              $scope.joinedRoomsId.rooms.push($scope.inviteCodeInput);
               $scope.inviteCodeInput = '';
               $scope.invalidInviteWarning = false;
             } else {
